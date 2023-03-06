@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
     }
         
     // Start consumers --------------------------------------------
-    // std::cout << "Creating consumers\n";
+     std::cout << "Creating consumers\n";
     for (int i = 0; i < n_consumers; ++i)
     {
         consumer_data.push_back(ConsumerWithOutput(i, &producers_finished, n_producers, output_values[i]));
