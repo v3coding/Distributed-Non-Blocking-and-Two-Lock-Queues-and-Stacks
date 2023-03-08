@@ -1,13 +1,21 @@
 #include "../common/allocator.h"
+#include <mutex>
 
 template <class T>
 class Node
 {
+    public :
+    T value;
+    Node<T>* next;
 };
 
 template <class T>
 class OneLockStack
 {
+
+    Node<T>* top;
+    std::mutex lock1;
+
     CustomAllocator my_allocator_;
 public:
     OneLockStack() : my_allocator_()
@@ -19,6 +27,9 @@ public:
     {
         std::cout << "Using Allocator\n";
         my_allocator_.initialize(t_my_allocator_size, sizeof(Node<T>));
+        Node<T>* newNode = (Node<T>*)my_allocator_.newNode();
+        newNode->next = NULL;
+        top = newNode;
         // Perform any necessary initializations
     }
 
@@ -28,6 +39,12 @@ public:
      */
     void push(T value)
     {
+        lock1.lock();
+        Node<T>* newNode = (Node<T>*)my_allocator_.newNode();
+        newNode->value = value;
+        newNode->next = top;
+        top = newNode;
+        lock1.unlock();
     }
 
     /**
@@ -37,7 +54,22 @@ public:
      */
     bool pop(T *value)
     {
-        return false;
+        lock1.lock();
+        removed++;
+
+        Node<T>* node = top;
+        Node<T>* new_top = top->next;
+
+        if(new_top == NULL){
+            lock1.unlock();
+            return 0;
+        }
+
+        *value = node->value;
+        top = new_top;
+        my_allocator_.freeNode(top);
+        lock1.unlock();
+        return 1;
     }
 
     void cleanup()

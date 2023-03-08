@@ -27,20 +27,19 @@ public:
     void initQueue(long t_my_allocator_size){
         std::cout << "Using Allocator\n";
 
-        lock1.lock();
+        inserted = 0;
+        removed = 0;
+
         my_allocator_.initialize(t_my_allocator_size, sizeof(Node<T>));
         Node<T>* newNode = (Node<T>*)my_allocator_.newNode();
         newNode->next = NULL;
         q_head = q_tail = newNode;
-        lock1.unlock();
-
     }
 
     void enqueue(T value)
     {
-       // std::cout << "enqueue\n";
-
         lock1.lock();
+        inserted++;
         Node<T>* newNode = (Node<T>*)my_allocator_.newNode();
         newNode->value = value;
         newNode->next = NULL;
@@ -51,23 +50,24 @@ public:
 
     bool dequeue(T *value)
     {
-      //  std::cout << "dequeue\n";
-
         lock1.lock();
-        Node<T>* oldHead = q_head;
-        *value = q_head->value;
+        removed++;
+        Node<T>* node = q_head;
+        Node<T>* new_head = q_head->next;
 
-        if(q_head->next == NULL){
-            q_head = NULL;
-            q_tail = NULL;
+        if(new_head == NULL){
+            lock1.unlock();
             return 0;
-        } else{
-            q_head = q_head->next;
         }
+
+        *value = new_head->value;
+
+        q_head = new_head;
+
+        my_allocator_.freeNode(&node);
 
         lock1.unlock();
 
-        my_allocator_.freeNode(oldHead);
         return 1;
     }
 
