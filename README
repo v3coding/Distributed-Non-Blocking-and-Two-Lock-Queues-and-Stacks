@@ -1,0 +1,23 @@
+Distributed Systems Project
+Implemented one lock and two lock and lockless queues as well as one lock stack
+
+Completed by me : Implementations of aforementioned queues and stacks in 
+
+non_blocking_queue.h 
+one_lock_queue.h 
+two_lock_queue.h
+one_lock_stack.h
+
+All work as intended,
+
+Implementations of note are the non blocking queue, 
+
+Which works on a distributed system by utilizing the unused bits in a pointer as a counter to validate 
+that the element that you are intending to pop or push is the correct element, even on a distributed system
+with no syncrhonization (this is very cool and non trivial)
+
+This is a pretty awesome alogrithm, documented by Maged M. Michael Michael L. Scott
+from the university of Rochester in this paper https://www.cs.rochester.edu/~scott/papers/1996_PODC_queues.pdf
+
+
+
